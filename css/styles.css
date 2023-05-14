@@ -47,7 +47,7 @@ h3{
 }
 .card {
   border-radius: 8px;
-  box-shadow: 6px 6px 10px -1px rgba(0,0,0,0.15),
+  box-shadow: 6px 6px 10px -1px rgba(0, 0, 255, 0.3),
 							-6px -6px 10px -1px rgba(255,255,255,0.7);
   transform: scale(0.95);
 }
@@ -68,11 +68,11 @@ h3{
   color: #fff !important;
 	border-radius: 8px;
 	font-weight: bold;
-  box-shadow: 6px 6px 10px -1px rgba(0,0,0,0.15),
+  box-shadow: 6px 6px 10px -1px rgba(0,0,0,0.5),
 							-6px -6px 10px -1px rgba(255,255,255,0.7);
 }
 .download-button:hover{
-  box-shadow: inset 4px 4px 6px -1px rgba(0,0,0,0.2),
+  box-shadow: inset 4px 4px 6px -1px rgba(0,0,0,0.5),
 							inset -4px -4px 6px -1px rgba(255,255,255,0.7),
 							-0.5px -0.5px 0px rgba(255,255,255,1),
 							-0.5px -0.5px 0px rgba(0,0,0,0.15),
@@ -183,11 +183,11 @@ h3{
 
 #title{
   color: #fff;
-  background-color: #ff4c68;
+  background-color: #9FC5E8;
 }
 #cta {
   color: #fff;
-  background-color: #ff4c68;
+  background-color: #00FFFF;
   text-align: center;
   padding: 0 8%;
 }
@@ -204,12 +204,12 @@ h3{
   position: relative;
 }
 #testimonials{
-  background-color: #fe7b7c;
+  background-color: #D9EAD3;
   text-align: center;
   color: #fff;
 }
 #press{
-  background-color: #fe7b7c;
+  background-color: #F9CB9C;
   padding-bottom: 5%;
   text-align: center;
 }
