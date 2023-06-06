@@ -183,11 +183,11 @@ h3{
 
 #title{
   color: #fff;
-  background-color: #9FC5E8;
+  background: linear-gradient(to right, #333399, #ff00cc);
 }
 #cta {
   color: #fff;
-  background-color: #00FFFF;
+  background: linear-gradient(to right, #333399, #ff00cc);
   text-align: center;
   padding: 0 8%;
 }
@@ -198,18 +198,18 @@ h3{
 }
 
 #features{
-  background-color: #fff;
+  background: linear-gradient(to right, #333399, #ff00cc);
   text-align: center;
   padding: 6% 15%;
   position: relative;
 }
 #testimonials{
-  background-color: #D9EAD3;
+  background: linear-gradient(to right, #333399, #ff00cc);
   text-align: center;
   color: #fff;
 }
 #press{
-  background-color: #F9CB9C;
+  background: linear-gradient(to right, #333399, #ff00cc);
   padding-bottom: 5%;
   text-align: center;
 }
