@@ -4,7 +4,13 @@ html {
 }
 
 body{
-  font-family: "Montserrat";
+    margin: 0;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: left;
+    background: linear-gradient(to right, #333399, #ff00cc);
 }
 
 h1{
@@ -65,7 +71,7 @@ h3{
 
 .download-button{
   margin: 5% 3% 5% 0;
-  color: #fff !important;
+  color: #080808 !important;
 	border-radius: 8px;
 	font-weight: bold;
   box-shadow: 6px 6px 10px -1px rgba(0,0,0,0.5),
@@ -84,22 +90,22 @@ h3{
 }
 
 .iphone-img{
-  width: 60%;
+  width: 50%;
   padding-top: 50px;
   position: absolute;
   right: 20%;
   transform: rotate(25deg);
 }
 .icon{
-  color: #fe7b7c;
+  color: #0d0e0d;
   font-size: 3rem;
   padding: 5%;
 }
 .icon:hover{
-  color: #ff4c68;
+  color: #e01a38;
 }
 .feature-line{
-  color: #8f8f8f;
+  color: #080808;
 }
 .feature-box{
   padding: 5%;
@@ -133,10 +139,10 @@ h3{
 }
 #footer p {
   padding: 10px;
-  color: #8f8f8f;
+  color: #000301;
 }
 .social-media a{
-	background: #fff;
+	background: #9527df;
 	height: 45px;
 	width: 45px;
 	margin: 0 15px 12px;
@@ -151,8 +157,9 @@ h3{
 }
 .social-media a{
 	font-size: 25px !important;
-	color: #555;
+	color: #010804;
 	transition: transform 0.5s;
+  background-color: #4fc8d8;
 }
 .social-icon:hover{
 	box-shadow: inset 4px 4px 6px -1px rgba(0,0,0,0.2),
@@ -167,49 +174,51 @@ h3{
 	transform: scale(0.90);
 }
 .social-icon:hover .fa-facebook{
-	color: #3b5998;
+	color: #0449df;
 }
 .social-icon:hover .fa-twitter{
 	color: #00acee;
 }
 .social-icon:hover .fa-instagram{
-	color: #f14843;
+	color: #f8635e;
 }
 .social-icon:hover .fa-envelope{
-	color: #f00;
+	color: rgb(172, 45, 45);
 }
 
 /* section div */
 
 #title{
-  color: #fff;
-  background-color: #9FC5E8;
+  color: #0a0000;
+  background-color: linear-gradient(to right, #333399, #ff00cc);
 }
 #cta {
-  color: #fff;
-  background-color: #00FFFF;
+  color: #0c0000;
+  background-color: linear-gradient(to right, #333399, #ff00cc);
   text-align: center;
   padding: 0 8%;
 }
 #cta h3 {
+  color: #0c0000;
   padding: 4% 15% 0;
   font-family: "Montserrat";
   font-weight: 900 !important;
 }
 
 #features{
-  background-color: #fff;
+  color: #0c0000;
+  background-color: linear-gradient(to right, #333399, #ff00cc);
   text-align: center;
   padding: 6% 15%;
   position: relative;
 }
 #testimonials{
-  background-color: #D9EAD3;
+  background-color: linear-gradient(to right, #333399, #ff00cc);
   text-align: center;
   color: #fff;
 }
 #press{
-  background-color: #F9CB9C;
+  background-color: linear-gradient(to right, #333399, #ff00cc);
   padding-bottom: 5%;
   text-align: center;
 }
@@ -229,20 +238,21 @@ h3{
   font-size: 1.8rem !important;
 }
 #pricing p {
-  color: #8f8f8f;
+  color: #000000;
   font-size: 18px;
 }
 h5 {
-  color: #8f8f8f;
+  color: #000000;
 }
 #pricing h2 {
   font-weight: 900 !important;
 }
 #pricing .row {
   margin: 0 auto !important;
+  color: #000000
 }
 .card-body .download-button {
-  color: #555 !important;
+  color: #000000 !important;
 }
 /* media query */
 @media (max-width: 992px) {
