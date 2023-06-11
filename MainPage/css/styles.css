@@ -124,6 +124,7 @@ h3{
 /* footer */
 
 #footer {
+  background: linear-gradient(to right, #5d5dda, #fd3bd6);
   text-align: center;
   padding: 6% 0 1%;
 }
@@ -183,11 +184,11 @@ h3{
 
 #title{
   color: #fff;
-  background-color: #9FC5E8;
+  background: linear-gradient(to right, #5d5dda, #fd3bd6);
 }
 #cta {
+  background: linear-gradient(to right, #5d5dda, #fd3bd6);
   color: #fff;
-  background-color: #00FFFF;
   text-align: center;
   padding: 0 8%;
 }
@@ -198,18 +199,18 @@ h3{
 }
 
 #features{
-  background-color: #fff;
+  background: linear-gradient(to right, #5d5dda, #fd3bd6);
   text-align: center;
   padding: 6% 15%;
   position: relative;
 }
 #testimonials{
-  background-color: #D9EAD3;
+  background: linear-gradient(to right, #5d5dda, #fd3bd6);
   text-align: center;
   color: #fff;
 }
 #press{
-  background-color: #F9CB9C;
+  background: linear-gradient(to right, #5d5dda, #fd3bd6);
   padding-bottom: 5%;
   text-align: center;
 }
@@ -218,6 +219,7 @@ h3{
 /* pricing section */
 
 #pricing {
+  background: linear-gradient(to right, #5d5dda, #fd3bd6);
   padding: 80px;
   text-align: center;
 }
