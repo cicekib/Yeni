@@ -271,13 +271,14 @@ h5 {
   }
   #cta {
     padding: 5%;
-}
-@media (min-width: 768px) {
-
-  #features h3 {
-    font-size: 30px !important;
   }
-  #cta {
-    padding: 5% !important;
+  @media (min-width: 768px) {
+
+    #features h3 {
+      font-size: 30px !important;
+    }
+    #cta {
+      padding: 5% !important;
+    }
   }
 }
