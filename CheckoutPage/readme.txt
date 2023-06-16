@@ -15,3 +15,8 @@ For checkout.html file:
 - Two JavaScripts are loaded: checkout.js from Nets and the custom script.js which you will implement in the next step.
 - Since this guide uses the Easy test environment, checkout.js is loaded from test.checkout.dibspayment.eu. When using the live environment, you should instead use checkout.dibspayment.eu.
 The checkout.html page should always be requested with a URL parameter called paymentId. This is because the paymentId is needed in order to identify the current payment session when communicating with Nets.
+
+For script.js file:
+- Replace <YOUR_CHECKOUT_KEY> with your checkout key for the test environment.
+- For the checkout.js script to load correctly, it's important that you have specified the correct URL to your checkout page in Step 3.
+- The checkout object will trigger the event 'payment-completed' once the payment has been completed. The callback function we provide navigates to completed.html which you will create in the next step.
