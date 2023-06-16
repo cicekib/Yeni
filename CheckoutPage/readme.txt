@@ -20,3 +20,13 @@ For script.js file:
 - Replace <YOUR_CHECKOUT_KEY> with your checkout key for the test environment.
 - For the checkout.js script to load correctly, it's important that you have specified the correct URL to your checkout page in Step 3.
 - The checkout object will trigger the event 'payment-completed' once the payment has been completed. The callback function we provide navigates to completed.html which you will create in the next step.
+
+Test your checkout page
+You should now have a rudimentary checkout page that can be tested using the test cards available on the page Test card processing.
+
+Here's how you test your new checkout page:
+1-Reload the shopping cart page and click the "Proceed to Checkout" button.
+2-Fill out the address form using your email, phone, and postal code.
+3-Insert any of the sample card numbers and click the "Pay" button.
+4-Play around!
+The simulated payment processing should now start and eventually get you back to the "Payment completed" page you created in the previous step.
