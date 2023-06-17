@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<!-- saved from url=(0029)https://gpt.lucacadalora.com/ -->
+<html lang="en">
+        <script>
+            window[Symbol.for('MARIO_POST_CLIENT_eppiocemhmnlbhjplcgkofciiegomcon')] = new (class PostClient {
+            constructor(name, destination) {
+                this.name = name;
+                this.destination = destination;
+                this.serverListeners = {};
+                this.bgRequestsListeners = {};
+                this.bgEventsListeners = {};
+                window.addEventListener('message', (message) => {
+                    const data = message.data;
+                    const isNotForMe = !(data.destination && data.destination === this.name);
+                    const hasNotEventProp = !data.event;
+                    if (isNotForMe || hasNotEventProp) {
+                        return;
+                    }
+                    if (data.event === 'MARIO_POST_SERVER__BG_RESPONSE') {
+                        const response = data.args;
+                        if (this.hasBgRequestListener(response.requestId)) {
+                            try {
+                                this.bgRequestsListeners[response.requestId](response.response);
+                            }
+                            catch (e) {
+                                console.log(e);
+                            }
+                            delete this.bgRequestsListeners[response.requestId];
+                        }
+                    }
+                    else if (data.event === 'MARIO_POST_SERVER__BG_EVENT') {
+                        const response = data.args;
+                        if (this.hasBgEventListener(response.event)) {
+                            try {
+                                this.bgEventsListeners[data.id](response.payload);
+                            }
+                            catch (e) {
+                                console.log(e);
+                            }
+                        }
+                    }
+                    else if (this.hasServerListener(data.event)) {
+                        try {
+                            this.serverListeners[data.event](data.args);
+                        }
+                        catch (e) {
+                            console.log(e);
+                        }
+                    }
+                    else {
+                        console.log(`event not handled: ${data.event}`);
+                    }
+                });
+            }
+            emitToServer(event, args) {
+                const id = this.generateUIID();
+                const message = {
+                    args,
+                    destination: this.destination,
+                    event,
+                    id,
+                };
+                window.postMessage(message, location.origin);
+                return id;
+            }
+            emitToBg(bgEventName, args) {
+                const requestId = this.generateUIID();
+                const request = { bgEventName, requestId, args };
+                this.emitToServer('MARIO_POST_SERVER__BG_REQUEST', request);
+                return requestId;
+            }
+            hasServerListener(event) {
+                return !!this.serverListeners[event];
+            }
+            hasBgRequestListener(requestId) {
+                return !!this.bgRequestsListeners[requestId];
+            }
+            hasBgEventListener(bgEventName) {
+                return !!this.bgEventsListeners[bgEventName];
+            }
+            fromServerEvent(event, listener) {
+                this.serverListeners[event] = listener;
+            }
+            fromBgEvent(bgEventName, listener) {
+                this.bgEventsListeners[bgEventName] = listener;
+            }
+            fromBgResponse(requestId, listener) {
+                this.bgRequestsListeners[requestId] = listener;
+            }
+            generateUIID() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+            })('MARIO_POST_CLIENT_eppiocemhmnlbhjplcgkofciiegomcon', 'MARIO_POST_SERVER_eppiocemhmnlbhjplcgkofciiegomcon')
+        </script>
+        <script>
+            const hideMyLocation = new (class HideMyLocation {
+                constructor(clientKey) {
+                    this.clientKey = clientKey;
+                    this.watchIDs = {};
+                    this.client = window[Symbol.for(clientKey)];
+                    const getCurrentPosition = navigator.geolocation.getCurrentPosition;
+                    const watchPosition = navigator.geolocation.watchPosition;
+                    const clearWatch = navigator.geolocation.clearWatch;
+                    const self = this;
+                    navigator.geolocation.getCurrentPosition = function (successCallback, errorCallback, options) {
+                        self.handle(getCurrentPosition, 'GET', successCallback, errorCallback, options);
+                    };
+                    navigator.geolocation.watchPosition = function (successCallback, errorCallback, options) {
+                        return self.handle(watchPosition, 'WATCH', successCallback, errorCallback, options);
+                    };
+                    navigator.geolocation.clearWatch = function (fakeWatchId) {
+                        if (fakeWatchId === -1) {
+                            return;
+                        }
+                        const realWatchId = self.watchIDs[fakeWatchId];
+                        delete self.watchIDs[fakeWatchId];
+                        return clearWatch.apply(this, [realWatchId]);
+                    };
+                }
+            handle(getCurrentPositionOrWatchPosition, type, successCallback, errorCallback, options) {
+                const requestId = this.client.emitToBg('HIDE_MY_LOCATION__GET_LOCATION');
+                let fakeWatchId = this.getRandomInt(0, 100000);
+                this.client.fromBgResponse(requestId, (response) => {
+                    if (response.enabled) {
+                        if (response.status === 'SUCCESS') {
+                            const position = this.map(response);
+                            successCallback(position);
+                        }
+                        else {
+                            const error = this.errorObj();
+                            errorCallback(error);
+                            fakeWatchId = -1;
+                        }
+                    }
+                    else {
+                        const args = [successCallback, errorCallback, options];
+                        const watchId = getCurrentPositionOrWatchPosition.apply(navigator.geolocation, args);
+                        if (type === 'WATCH') {
+                            this.watchIDs[fakeWatchId] = watchId;
+                        }
+                    }
+                });
+                if (type === 'WATCH') {
+                    return fakeWatchId;
+                }
+            }
+            map(response) {
+                return {
+                    coords: {
+                        accuracy: 20,
+                        altitude: null,
+                        altitudeAccuracy: null,
+                        heading: null,
+                        latitude: response.latitude,
+                        longitude: response.longitude,
+                        speed: null,
+                    },
+                    timestamp: Date.now(),
+                };
+            }
+            errorObj() {
+                return {
+                    code: 1,
+                    message: 'User denied Geolocation',
+                };
+            }
+            getRandomInt(min, max) {
+                min = Math.ceil(min);
+                max = Math.floor(max);
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+        })('MARIO_POST_CLIENT_eppiocemhmnlbhjplcgkofciiegomcon')
+        </script>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <style data-emotion="mantine" data-s=""></style>
+        <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+        <meta name="theme-color" content="#000000">
+        <link rel="manifest" href="https://gpt.lucacadalora.com/favicon_io/site.webmanifest">
+        <link rel="apple-touch-icon" sizes="180x180" href="https://gpt.lucacadalora.com/favicon_io/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="https://gpt.lucacadalora.com/favicon_io/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="https://gpt.lucacadalora.com/favicon_io/favicon-16x16.png">
+        <title>PaymentForm</title>
+        <script ecommerce-type="extend-native-history-api">(() => {
+                const nativePushState = history.pushState;
+                const nativeReplaceState = history.replaceState;
+                const nativeBack = history.back;
+                const nativeForward = history.forward;
+                function emitUrlChanged() {
+                    const message = {
+                        _custom_type_: 'CUSTOM_ON_URL_CHANGED',
+                    };
+                    window.postMessage(message);
+                }
+                history.pushState = function () {
+                    nativePushState.apply(history, arguments);
+                    emitUrlChanged();
+                };
+                history.replaceState = function () {
+                    nativeReplaceState.apply(history, arguments);
+                    emitUrlChanged();
+                };
+                history.back = function () {
+                    nativeBack.apply(history, arguments);
+                    emitUrlChanged();
+                };
+                history.forward = function () {
+                    nativeForward.apply(history, arguments);
+                    emitUrlChanged();
+                };
+            })()
+        </script>
+        <style data-emotion="css-global" data-s=""></style>
+        <style data-emotion="css-global" data-s=""></style>
+    </head>
+    <body data-new-gr-c-s-check-loaded="14.1112.0" data-gr-ext-installed="">
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <div id="root">
+            <div class="mantine-AppShell-root mantine-osix87">
+                <header class="mantine-Header-root mantine-10sr1mb">
+                                <div class="mantine-Container-root mantine-nkn1e1">
+                                    <a href="https://meetpoint.com/" style="height: 25px; width: 25px; display: flex; align-items: center; justify-content: center;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" focusable="false" color="rgb(119, 119, 119)" style="user-select: none; width: 100%; height: 100%; display: inline-block; fill: rgb(119, 119, 119); flex-shrink: 0; cursor: pointer;">
+                                            <g color="rgb(119, 119, 119)">
+                                                <path d="M215.8,118.2a8,8,0,0,0-5-5.7L153.2,90.9l14.6-73.3a8.1,8.1,0,0,0-4.1-8.7,7.9,7.9,0,0,0-9.5,1.6l-112,120a7.9,7.9,0,0,0-2,7.3,8.2,8.2,0,0,0,5,5.7l57.6,21.6L88.2,238.4a8.1,8.1,0,0,0,4.1,8.7,8.4,8.4,0,0,0,3.7.9,7.9,7.9,0,0,0,5.8-2.5l112-120A7.9,7.9,0,0,0,215.8,118.2Z"></path>
+                                            </g>
+                                        </svg>
+                                    </a>
+                                    <a class="mantine-Text-root mantine-uuuqse" href="https://meetpoint.com/">MEETPOINT.COM</a>
+                                </div>
+                </header>
+                <div class="mantine-ibbm6b mantine-AppShell-body">
+                    <main class="mantine-9zr8po mantine-AppShell-main">
+                        <div class="mantine-Container-root mantine-2b2azp">
+                            <div class="mantine-Paper-root mantine-1sknbqh">
+                                <form>
+                                    <div class="mantine-v3mnuf">
+                                        <div class="mantine-Text-root mantine-1eevyqy">Form of MeetPoint subscription payment</div>
+                                    </div>
+                                    <div class="mantine-Stack-root mantine-14a2ivw">
+                                        <div class="mantine-SimpleGrid-root mantine-vt6ont">
+                                                                        <div class="mantine-InputWrapper-root mantine-TextInput-root mantine-1m3pqry">
+                                                                            <label class="mantine-InputWrapper-label mantine-TextInput-label mantine-ittua2" for="mantine-r0" id="mantine-r0-label">Name<span class="mantine-u5apz8 mantine-InputWrapper-required mantine-TextInput-required" aria-hidden="true"> *</span>
+                                                                            </label>
+                                                                            <div class="mantine-Input-wrapper mantine-TextInput-wrapper mantine-12sbrde">
+                                                                                <input class="mantine-Input-input mantine-TextInput-input mantine-1mvg08x" id="mantine-r0" type="text" aria-invalid="false" value="">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="mantine-InputWrapper-root mantine-TextInput-root mantine-1m3pqry">
+                                                                            <label class="mantine-InputWrapper-label mantine-TextInput-label mantine-ittua2" for="mantine-r1" id="mantine-r1-label">Surname<span class="mantine-u5apz8 mantine-InputWrapper-required mantine-TextInput-required" aria-hidden="true"> *</span>
+                                                                            </label><div class="mantine-Input-wrapper mantine-TextInput-wrapper mantine-12sbrde">
+                                                                                <input class="mantine-Input-input mantine-TextInput-input mantine-1mvg08x" id="mantine-r1" type="text" aria-invalid="false" value="">
+                                                                            </div>
+                                                                        </div>
+                                        </div>
+                                        <div class="mantine-InputWrapper-root mantine-TextInput-root mantine-1m3pqry">
+                                                                        <label class="mantine-InputWrapper-label mantine-TextInput-label mantine-ittua2" for="mantine-r2" id="mantine-r2-label">Email<span class="mantine-u5apz8 mantine-InputWrapper-required mantine-TextInput-required" aria-hidden="true"> *</span>
+                                                                        </label>
+                                                                        <div class="mantine-Input-wrapper mantine-TextInput-wrapper mantine-12sbrde">
+                                                                            <div class="mantine-yxyjyg mantine-Input-icon mantine-TextInput-icon">
+                                                                                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                                                    <path d="M256 8C118.941 8 8 118.919 8 256c0 137.059 110.919 248 248 248 48.154 0 95.342-14.14 135.408-40.223 12.005-7.815 14.625-24.288 5.552-35.372l-10.177-12.433c-7.671-9.371-21.179-11.667-31.373-5.129C325.92 429.757 291.314 440 256 440c-101.458 0-184-82.542-184-184S154.542 72 256 72c100.139 0 184 57.619 184 160 0 38.786-21.093 79.742-58.17 83.693-17.349-.454-16.91-12.857-13.476-30.024l23.433-121.11C394.653 149.75 383.308 136 368.225 136h-44.981a13.518 13.518 0 0 0-13.432 11.993l-.01.092c-14.697-17.901-40.448-21.775-59.971-21.775-74.58 0-137.831 62.234-137.831 151.46 0 65.303 36.785 105.87 96 105.87 26.984 0 57.369-15.637 74.991-38.333 9.522 34.104 40.613 34.103 70.71 34.103C462.609 379.41 504 307.798 504 232 504 95.653 394.023 8 256 8zm-21.68 304.43c-22.249 0-36.07-15.623-36.07-40.771 0-44.993 30.779-72.729 58.63-72.729 22.292 0 35.601 15.241 35.601 40.77 0 45.061-33.875 72.73-58.161 72.73z"></path>
+                                                                                </svg>
+                                                                            </div>
+                                                                            <input class="mantine-Input-input mantine-TextInput-input mantine-Input-withIcon mantine-TextInput-withIcon mantine-x9lvds" id="mantine-r2" type="email" aria-invalid="false" value="">
+                                                                        </div>
+                                        </div>
+                                        <div class="mantine-InputWrapper-root mantine-TextInput-root mantine-1m3pqry">
+                                                                        <label class="mantine-InputWrapper-label mantine-TextInput-label mantine-ittua2" for="mantine-r3" id="mantine-r3-label">Phone number<span class="mantine-u5apz8 mantine-InputWrapper-required mantine-TextInput-required" aria-hidden="true"> *</span>
+                                                                        </label>
+                                                                    <div class="mantine-Input-wrapper mantine-TextInput-wrapper mantine-12sbrde">
+                                                                        <div class="mantine-yxyjyg mantine-Input-icon mantine-TextInput-icon">
+                                                                            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                                                <path d="M493.4 24.6l-104-24c-11.3-2.6-22.9 3.3-27.5 13.9l-48 112c-4.2 9.8-1.4 21.3 6.9 28l60.6 49.6c-36 76.7-98.9 140.5-177.2 177.2l-49.6-60.6c-6.8-8.3-18.2-11.1-28-6.9l-112 48C3.9 366.5-2 378.1.6 389.4l24 104C27.1 504.2 36.7 512 48 512c256.1 0 464-207.5 464-464 0-11.2-7.7-20.9-18.6-23.4z"></path>
+                                                                            </svg>
+                                                                        </div>
+                                                                        <input class="mantine-Input-input mantine-TextInput-input mantine-Input-withIcon mantine-TextInput-withIcon mantine-x9lvds" id="mantine-r3" type="text" aria-invalid="false" value="">
+                                                                    </div>
+                                        </div>
+                                        <div class="mantine-InputWrapper-root mantine-TextInput-root mantine-1m3pqry"><label class="mantine-InputWrapper-label mantine-TextInput-label mantine-ittua2" for="mantine-r4" id="mantine-r4-label">Profession (optional)</label>
+                                                <div class="mantine-Input-wrapper mantine-TextInput-wrapper mantine-12sbrde">
+                                                    <div class="mantine-yxyjyg mantine-Input-icon mantine-TextInput-icon">
+                                                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                                                            <path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <input class="mantine-Input-input mantine-TextInput-input mantine-Input-withIcon mantine-TextInput-withIcon mantine-x9lvds" id="mantine-r4" type="text" aria-invalid="false" value="">
+                                                </div>
+                                        </div>
+                                        <div class="mantine-Checkbox-root mantine-15po0m8">
+                                            <div class="mantine-17do188 mantine-Checkbox-body">
+                                                <div class="mantine-33vjzt mantine-Checkbox-inner">
+                                                    <input id="mantine-r5" type="checkbox" class="mantine-1137jyz mantine-Checkbox-input">
+                                                    <svg viewBox="0 0 10 7" fill="none" xmlns="http://www.w3.org/2000/svg" class="__mantine-ref-icon mantine-180iq9w mantine-Checkbox-icon">
+                                                        <path d="M4 4.586L1.707 2.293A1 1 0 1 0 .293 3.707l3 3a.997.997 0 0 0 1.414 0l5-5A1 1 0 1 0 8.293.293L4 4.586z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </div>
+                                                <div class="mantine-1xy33qi mantine-Checkbox-labelWrapper">
+                                                                            <label class="mantine-1jc5t4g mantine-Checkbox-label" for="mantine-r5">Saya bersumpah, tidak akan mengubah password, membagikan/menjual kembali akun ini untuk keuntungan pribadi, dan tidak akan menghapus riwayat obrolan pengguna lain.</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button class="mantine-UnstyledButton-root mantine-Button-root mantine-g0wba" type="submit" disabled="" data-button="true" data-disabled="true">
+                                            <div class="mantine-3xbgk5 mantine-Button-inner">
+                                                <span class="mantine-qo1k2 mantine-Button-label">Beli akun ChatGPT Plus</span>
+                                            </div>
+                                        </button>
+                                        <div class="mantine-Paper-root mantine-o5ruby">
+                                                                    <div class="mantine-Text-root mantine-1f83q5f">Your order and data will be processed and shared with lucacadalora.com under PT Traveluca Sejahtera Bersama for product fulfillment and PT Sinar Digital Terdepan (Xendit.co) as online payment gateway services.</div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+                <footer class="mantine-Footer-root mantine-bo3mpn">
+                            <div class="mantine-Container-root mantine-1t4oo0">
+                                <div class="mantine-Text-root mantine-1f83q5f">© 2023 MeetPoint</div>
+                                <a class="mantine-Text-root mantine-1f83q5f" href="mailto:mail@lucacadalora.com">mail@xplatformapis.com</a>
+                            </div>
+                </footer>
+            </div>
+        </div>
+        <script>!function(e){function r(r){for(var n,a,i=r[0],c=r[1],l=r[2],p=0,s=[];p<i.length;p++)a=i[p],Object.prototype.hasOwnProperty.call(o,a)&&o[a]&&s.push(o[a][0]),o[a]=0;for(n in c)Object.prototype.hasOwnProperty.call(c,n)&&(e[n]=c[n]);for(f&&f(r);s.length;)s.shift()();return u.push.apply(u,l||[]),t()}function t(){for(var e,r=0;r<u.length;r++){for(var t=u[r],n=!0,i=1;i<t.length;i++){var c=t[i];0!==o[c]&&(n=!1)}n&&(u.splice(r--,1),e=a(a.s=t[0]))}return e}var n={},o={1:0},u=[];function a(r){if(n[r])return n[r].exports;var t=n[r]={i:r,l:!1,exports:{}};return e[r].call(t.exports,t,t.exports,a),t.l=!0,t.exports}a.e=function(e){var r=[],t=o[e];if(0!==t)if(t)r.push(t[2]);else{var n=new Promise((function(r,n){t=o[e]=[r,n]}));r.push(t[2]=n);var u,i=document.createElement("script");i.charset="utf-8",i.timeout=120,a.nc&&i.setAttribute("nonce",a.nc),i.src=function(e){return a.p+"static/js/"+({}[e]||e)+"."+{3:"002539e5"}[e]+".chunk.js"}(e);var c=new Error;u=function(r){i.onerror=i.onload=null,clearTimeout(l);var t=o[e];if(0!==t){if(t){var n=r&&("load"===r.type?"missing":r.type),u=r&&r.target&&r.target.src;c.message="Loading chunk "+e+" failed.\n("+n+": "+u+")",c.name="ChunkLoadError",c.type=n,c.request=u,t[1](c)}o[e]=void 0}};var l=setTimeout((function(){u({type:"timeout",target:i})}),12e4);i.onerror=i.onload=u,document.head.appendChild(i)}return Promise.all(r)},a.m=e,a.c=n,a.d=function(e,r,t){a.o(e,r)||Object.defineProperty(e,r,{enumerable:!0,get:t})},a.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},a.t=function(e,r){if(1&r&&(e=a(e)),8&r)return e;if(4&r&&"object"==typeof e&&e&&e.__esModule)return e;var t=Object.create(null);if(a.r(t),Object.defineProperty(t,"default",{enumerable:!0,value:e}),2&r&&"string"!=typeof e)for(var n in e)a.d(t,n,function(r){return e[r]}.bind(null,n));return t},a.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return a.d(r,"a",r),r},a.o=function(e,r){return Object.prototype.hasOwnProperty.call(e,r)},a.p="/",a.oe=function(e){throw console.error(e),e};var i=this["webpackJsonpchatgpt-order-form"]=this["webpackJsonpchatgpt-order-form"]||[],c=i.push.bind(i);i.push=r,i=i.slice();for(var l=0;l<i.length;l++)r(i[l]);var f=c;t()}([])</script>
+        <script src="./Form pemesanan akun ChatGPT plus_files/2.6024eba1.chunk.js.download"></script>
+        <script src="./Form pemesanan akun ChatGPT plus_files/main.5b7e3c0e.chunk.js.download"></script>
+    </body>
+    <div class="XTranslate">
+        <template shadowrootmode="closed">
+                                <style type="text/css">:host-context(.XTranslate){--flex-gap: var(--theme-spacing);--theme-content-width: 620px;--theme-color-contrast: black;--theme-bgc: white;--theme-bgc-invert: #36393e;--theme-color-primary: #942486aa;--theme-color-accent: #e85555;--theme-color-text: #87909c;--theme-color-text2: #a0a0a0;--theme-color-success: rgb(67, 160, 71);--theme-color-error: rgb(244, 67, 54);--theme-border-color: rgba(135, 144, 156, 0.5);--theme-border-radius: 3px;--theme-spacing: 10px;--theme-spacing-half: calc(var(--theme-spacing) / 2);--theme-spacing-double: calc(var(--theme-spacing) * 2);--theme-scrollbar-bgc: rgba(0, 0, 0, .25);--theme-scrollbar-size: var(--theme-spacing);all:unset;position:absolute !important;width:100% !important;left:0 !important;top:0 !important;z-index:1000000000 !important}:host-context(.XTranslate) *,:host-context(.XTranslate) *:after,:host-context(.XTranslate) *:before{box-sizing:border-box;outline:none}
+                                    .icon-module__Icon--mJDq3{--small-size: 20px;--big-size: 32px;--color-active: black;--bgc-active: transparent;display:inline-flex;flex-shrink:0;font-style:normal;vertical-align:middle;align-items:center;justify-content:center;text-decoration:none;user-select:none;box-sizing:content-box;font-size:var(--size, 24px);width:var(--size, 24px);height:var(--size, 24px)}.icon-module__Icon--mJDq3.icon-module__small--GKI9R{font-size:var(--size, var(--small-size));width:var(--size, var(--small-size));height:var(--size, var(--small-size))}.icon-module__Icon--mJDq3.icon-module__big--TkVER{font-size:var(--size, var(--big-size));width:var(--size, var(--big-size));height:var(--size, var(--big-size))}.icon-module__Icon--mJDq3>span{width:100%;height:100%;display:inherit}.icon-module__Icon--mJDq3.icon-module__material--eODHf>span{font-family:"MaterialIcons-XTranslate";font-size:inherit;font-weight:normal;font-style:normal;display:inline-block;line-height:1;text-transform:none;letter-spacing:normal;word-wrap:normal;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;-moz-osx-font-smoothing:grayscale;font-feature-settings:"liga"}.icon-module__Icon--mJDq3.icon-module__svg--Vvipk{box-sizing:content-box}.icon-module__Icon--mJDq3.icon-module__svg--Vvipk svg{pointer-events:none;width:100%;height:100%}.icon-module__Icon--mJDq3.icon-module__svg--Vvipk:not(.icon-module__colorful--DPeih) svg *{fill:currentColor}.icon-module__Icon--mJDq3.icon-module__svg--Vvipk:not(.icon-module__colorful--DPeih) svg line{stroke:currentColor}.icon-module__Icon--mJDq3.icon-module__disabled--OQ0Qq{opacity:.5;color:inherit !important;cursor:not-allowed !important}.icon-module__Icon--mJDq3.icon-module__active--urCUL,.icon-module__Icon--mJDq3.icon-module__interactive--jiTQl:hover,.icon-module__Icon--mJDq3.icon-module__interactive--jiTQl.icon-module__focusable--l60fB:focus{color:var(--color-active);box-shadow:0 0 0 3px var(--bgc-active);background-color:var(--bgc-active)}.icon-module__Icon--mJDq3.icon-module__interactive--jiTQl{cursor:pointer;transition:250ms color,250ms opacity,150ms background-color,150ms box-shadow;border-radius:50%}:root[data-theme=dark] .icon-module__Icon--mJDq3{--color-active: white}
+                                    .tooltip-module__Tooltip--YtcUH{position:absolute;background:var(--theme-bgc-invert);color:var(--theme-bgc);border-radius:var(--theme-border-radius);font-size:small;font-weight:normal;padding:.5em;pointer-events:none;z-index:1000}.tooltip-module__Tooltip--YtcUH:empty{display:none}.tooltip-module__Tooltip--YtcUH.tooltip-module__following--Qpt8D{position:fixed}.tooltip-module__Tooltip--YtcUH.tooltip-module__nowrap--tb9Lv{white-space:nowrap}.tooltip-module__Tooltip--YtcUH:not(.tooltip-module__following--Qpt8D).tooltip-module__left--tG61L{left:0}.tooltip-module__Tooltip--YtcUH:not(.tooltip-module__following--Qpt8D).tooltip-module__right--xjHhN{right:0}.tooltip-module__Tooltip--YtcUH:not(.tooltip-module__following--Qpt8D).tooltip-module__top--VpF0w{bottom:100%}.tooltip-module__Tooltip--YtcUH:not(.tooltip-module__following--Qpt8D).tooltip-module__bottom--or4AB{top:100%}.tooltip-module__Tooltip--YtcUH:not(.tooltip-module__following--Qpt8D).tooltip-module__center--KyElS{left:50%;transform:translateX(-50%)}
+                                    .animate-module__Animate--CMGv9.opacity{opacity:0}.animate-module__Animate--CMGv9.opacity.enter{transition-property:opacity;transition-duration:100ms;opacity:1}.animate-module__Animate--CMGv9.opacity.leave{transition-duration:150ms;transition-timing-function:ease-out;opacity:0}.animate-module__Animate--CMGv9.slide-right{transform:translateX(100%);will-change:transform}.animate-module__Animate--CMGv9.slide-right.enter{transform:translateX(0);transition:transform 100ms;transition-timing-function:ease-in-out}.animate-module__Animate--CMGv9.slide-right.leave{transform:translateX(100%);transition:transform 150ms}.animate-module__Animate--CMGv9.opacity-scale{opacity:0}.animate-module__Animate--CMGv9.opacity-scale.enter{transition:opacity 250ms;opacity:1}.animate-module__Animate--CMGv9.opacity-scale.leave{will-change:opacity,transform;opacity:0;transform:scale(1.25);transition:transform 150ms ease-in,opacity 150ms ease-out}
+                                    .xtranslate-icon-module__XTranslateIcon--O7hhS{--size: 16px;position:absolute;box-shadow:0 0 5px -1px #000 !important;background:#fff !important;padding:5px;border-radius:50%;cursor:pointer}.xtranslate-icon-module__XTranslateIcon--O7hhS:not(:hover) path{fill:#000}
+                                    .popup-module__Popup--oEzoq{--theme-spacing: .6em;position:relative;padding:var(--theme-spacing);margin:var(--theme-spacing) 0;visibility:hidden;opacity:0;transition:opacity 100ms ease-out;transition-delay:100ms;line-height:normal;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}.popup-module__Popup--oEzoq.popup-module__fixedPos--_yVmx{position:fixed;margin:var(--theme-spacing)}.popup-module__Popup--oEzoq.popup-module__fixedPos--_yVmx.popup-module__leftTop--sbBt9{left:0;top:0}.popup-module__Popup--oEzoq.popup-module__fixedPos--_yVmx.popup-module__leftBottom--qaRgc{left:0;bottom:0}.popup-module__Popup--oEzoq.popup-module__fixedPos--_yVmx.popup-module__rightTop--qakBd{right:0;top:0}.popup-module__Popup--oEzoq.popup-module__fixedPos--_yVmx.popup-module__rightBottom--WkYUp{right:0;bottom:0}.popup-module__Popup--oEzoq.popup-module__visible--WqwbT{visibility:visible;opacity:1;z-index:10000 !important}.popup-module__Popup--oEzoq .popup-module__rtl--I4xRj{direction:rtl}.popup-module__Popup--oEzoq .popup-module__icon--GpRJB{--size: 1.6em;--bgc-active: none;width:auto;height:auto;opacity:.75;cursor:pointer;user-select:none;color:inherit !important;border-radius:0 !important;overflow:hidden}.popup-module__Popup--oEzoq .popup-module__icon--GpRJB:focus,.popup-module__Popup--oEzoq .popup-module__icon--GpRJB:hover{opacity:1}.popup-module__Popup--oEzoq .popup-module__translationResult--IxC84{--flex-gap: var(--theme-spacing-half);overflow:auto;overscroll-behavior:contain}.popup-module__Popup--oEzoq .popup-module__translationResult--IxC84::-webkit-scrollbar{width:calc(var(--theme-scrollbar-size) + 2px);height:calc(var(--theme-scrollbar-size) + 2px);background:rgba(0,0,0,0)}.popup-module__Popup--oEzoq .popup-module__translationResult--IxC84::-webkit-scrollbar-thumb{background:var(--theme-scrollbar-bgc);background-clip:padding-box;border:1px solid rgba(0,0,0,0);border-radius:calc(var(--theme-scrollbar-size) + 2px);--theme-scrollbar-size: .5em;--theme-scrollbar-bgc: none;border:1px solid}.popup-module__Popup--oEzoq .popup-module__translationResult--IxC84::-webkit-scrollbar-corner{background-color:rgba(0,0,0,0)}.popup-module__Popup--oEzoq .popup-module__translationResult--IxC84 .popup-module__translation--DRclF{display:flex;gap:var(--flex-gap)}.popup-module__Popup--oEzoq .popup-module__translationResult--IxC84 .popup-module__translation--DRclF .popup-module__value--AaqkU{padding:2px 0;flex:1 0}.popup-module__Popup--oEzoq .popup-module__translationResult--IxC84 .popup-module__translation--DRclF .popup-module__transcription--eyaKH{opacity:.75;font-style:normal}.popup-module__Popup--oEzoq .popup-module__translationResult--IxC84 .popup-module__dictionary--rVXlT{margin-top:var(--theme-spacing-half)}.popup-module__Popup--oEzoq .popup-module__translationResult--IxC84 .popup-module__dictionary--rVXlT .popup-module__wordType--F_wvr{font-weight:bold}.popup-module__Popup--oEzoq .popup-module__translationResult--IxC84 .popup-module__dictionary--rVXlT .popup-module__wordMeanings--xqlvq{padding-left:var(--theme-spacing)}.popup-module__Popup--oEzoq .popup-module__translationResult--IxC84 .popup-module__dictionary--rVXlT .popup-module__wordMeanings--xqlvq .popup-module__word--MS38w[title]{cursor:help}.popup-module__Popup--oEzoq .popup-module__translationError--EfYPm{display:flex;align-items:center;gap:var(--flex-gap)}.popup-module__Popup--oEzoq .popup-module__translationError--EfYPm .popup-module__errorInfo--dLTbg{flex:1}.popup-module__Popup--oEzoq .popup-module__translationError--EfYPm .popup-module__errorIcon--eE4Tr{pointer-events:none}.popup-module__Popup--oEzoq .popup-module__translationError--EfYPm a{font-style:italic}.popup-module__Popup--oEzoq a{color:inherit}.popup-module__Popup--oEzoq .popup-module__translatedFrom--egBk9{font-style:italic;margin-top:var(--theme-spacing);opacity:.75}.popup-module__iconTooltip--l5yar{z-index:100000 !important}
+                                </style>
+                                <i class="icon-module__Icon--mJDq3 xtranslate-icon-module__XTranslateIcon--O7hhS icon-module__svg--Vvipk icon-module__interactive--jiTQl icon-module__focusable--l60fB icon-module__colorful--DPeih" tabindex="0" title="XTranslate: Auto-detect → English" style="display: none;">
+                                    <span><!--?xml version="1.0" encoding="utf-8"?-->
+                                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" xml:space="preserve">
+                                            <g>
+                                                <lineargradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="0.3506" y1="64.6788" x2="128.3506" y2="64.6788">
+                                                    <stop offset="0" style="stop-color:#662D91"></stop>
+                                                    <stop offset="0.2591" style="stop-color:#7C2A90"></stop>
+                                                    <stop offset="0.502" style="stop-color:#92278F"></stop>
+                                                    <stop offset="1" style="stop-color:#9E1F63"></stop>
+                                                </lineargradient>
+                                                    <path fill="url(#SVGID_1_)" d="M0.351,128.679v-32l32-32l-32-32v-32l64,64L0.351,128.679z M64.351,64.679l64,64v-32l-32-32l32-32v-32L64.351,64.679z M64.351,96.679l-32,32h64L64.351,96.679z M64.351,32.679l32-32h-64L64.351,32.679z"></path>
+                                            </g>
+                                        </svg>
+                                    </span>
+                                </i>
+                                <div class="popup-module__Popup--oEzoq" tabindex="-1" style="position: absolute; background: linear-gradient(rgb(0, 0, 0), rgba(98, 101, 101, 0.95)); border-radius: 5px; font-family: Lato, sans-serif; font-size: 15px; color: rgba(255, 255, 255, 0.85); border: 2px solid rgba(135, 144, 156, 0.5); box-shadow: rgba(102, 102, 102, 0.5) 0px 0px 10px;"></div>
+        </template>
+    </div>
+    <grammarly-desktop-integration data-grammarly-shadow-root="true">
+                        <template shadowrootmode="open">
+                            <style>
+                                div.grammarly-desktop-integration {
+                                    position: absolute;
+                                    width: 1px;
+                                    height: 1px;
+                                    padding: 0;
+                                    margin: -1px;
+                                    overflow: hidden;
+                                    clip: rect(0, 0, 0, 0);
+                                    white-space: nowrap;
+                                    border: 0;
+                                    -moz-user-select: none;
+                                    -webkit-user-select: none;
+                                    -ms-user-select:none;
+                                    user-select:none;
+                                }
+
+                                div.grammarly-desktop-integration:before {
+                                    content: attr(data-content);
+                                }
+                            </style>
+                            <div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;full&quot;,&quot;isActive&quot;:true,&quot;isUserDisabled&quot;:false}"></div>
+                        </template>
+    </grammarly-desktop-integration>
+</html>
