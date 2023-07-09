@@ -6,6 +6,7 @@
 /* The main container */
 
 .container {
+    
     width: 80%;
     margin: auto;
     margin-top: 2rem;
@@ -30,6 +31,7 @@ img {
     margin: 0;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
+    background: linear-gradient(to right, #8787ec, #b851a3);
 }
 
 .msgimg {
@@ -42,6 +44,7 @@ img {
     height: auto; 
     float: left;
     margin: 0;
+   
 }
 
 /* styling user-name */
@@ -58,6 +61,7 @@ img {
 /* Styling the chat box container */
 .chat-page {
     padding: 0 0 50px 0;
+    background: linear-gradient(to right, #333399, #ff00cc);
 }
 
 .msg-inbox {
@@ -85,7 +89,7 @@ img {
         border-top: 1px solid #ccc;
         position: relative;
         height: 11%;
-        background-color: rgb(239 239 239);
+        background-color: rgb(146, 16, 233);
     }
 /* Styling the input field */
     .input-group {
@@ -171,9 +175,9 @@ received-chats-img {
 }
 
 .received-msg-inbox p {
-    background: #efefef none repeat scroll 0 0;
+    background: #a8e9ee none repeat scroll 0 0;
     border-radius: 10px;
-    color: #646464;
+    color: #080707;
     font-size: 14px;
     margin-left: 1rem;
     padding: 1rem;
