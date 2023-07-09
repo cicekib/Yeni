@@ -222,5 +222,48 @@ received-chats-img {
     margin-right: 1rem;
 }
 
+@media only screen and (max-device-width: 850px) {
+    *,
+    .time {
+        font-size: 28px;
+    }
+    img {
+        width: 65px;
+    }
+    .msg-header {
+        height: 5%;
+    }
+    .msg-page {
+        max-height: none;
+    }
+    .received-msg-inbox p {
+        font-size: 28px;
+    }
+    .outgoing-chats-msg p {
+        font-size: 28px;
+    }
+}
+
+@media only screen and (max-device-width: 450px) {
+    *,
+    .time {
+        font-size: 28px;
+    }
+    img {
+        width: 65px;
+    }
+    .msg-header {
+        height: 5%;
+    }
+    .msg-page {
+        max-height: none;
+    }
+    .received-msg-inbox p {
+        font-size: 28px;
+    }
+    .outgoing-chats-msg p {
+        font-size: 28px;
+    }
+}
 
 
