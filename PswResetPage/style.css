@@ -1,0 +1,216 @@
+@import url("reset.css");
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(to right, #333399, #ff00cc);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* reset Card */
+.reset-card {
+    width: 450px;
+    background: rgba(255, 255, 255, .5);
+    padding: 4rem;
+    border-radius: 10px;
+    position: relative;
+}
+
+.reset-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, .15);
+    transform: rotate(90deg);
+    border-radius: 10px;
+    z-index: -1;
+}
+/* ---------- */
+
+/* reset Card Logo */
+.reset-card-logo {
+    margin-bottom: 2rem;
+}
+
+.reset-card-logo img {
+    width: 70px;
+}
+/* ---------- */
+
+/* reset Card Standard */
+.reset-card-logo,
+.reset-card-header,
+.reset-card-footer {
+    text-align: center;
+}
+
+.reset-card a {
+    text-decoration: none;
+    color: #35339a;
+}
+
+.reset-card a:hover {
+    text-decoration: underline;
+}
+/* ---------- */
+
+/* reset Card Header */
+.reset-card-header {
+    margin-bottom: 2rem;
+}
+
+.reset-card-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: .5rem;
+}
+
+.reset-card-header h1+div {
+    font-size: calc(1rem * .8);
+    opacity: .8;
+}
+/* ---------- */
+
+/* reset Card Form */
+.reset-card-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.reset-card-form .form-item {
+    position: relative;
+}
+
+.reset-card-form .form-item .form-item-icon {
+    position: absolute;
+    top: .82rem;
+    left: 1.4rem;
+    font-size: 1.3rem;
+    opacity: .4;
+}
+
+.reset-card-form .checkbox {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.reset-card-form .form-item-other {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: calc(1rem * .8);
+    margin-bottom: .5rem;
+}
+/* ---------- */
+
+/* reset Card Footer */
+.reset-card-footer {
+    margin-top: 1.5rem;
+    font-size: calc(1rem * .8);
+}
+/* ---------- */
+
+/* reset Card Form Elements */
+.reset-card input[type="text"],
+.reset-card input[type="password"],
+.reset-card input[type="email"] {
+    border: none;
+    outline: none;
+    background: rgba(255, 255, 255, .3);
+    padding: 1rem 1.5rem;
+    padding-left: calc(1rem * 3.5);
+    border-radius: 100px;
+    width: 100%;
+    transition: background .5s;
+}
+
+.reset-card input:focus {
+    background: white;
+}
+
+.reset-card input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: black;
+}
+
+.reset-card button {
+    background: black;
+    color: white;
+    padding: 1rem;
+    border-radius: 100px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: background .5s;
+}
+
+.reset-card button:hover {
+    background-color: rgba(0, 0, 0, 0.85);
+    cursor: pointer;
+}
+/* ---------- */
+
+/* reset Card Social Buttons */
+.reset-card-social {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.reset-card-social>div {
+    opacity: .8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: calc(1rem * .8);
+}
+
+.reset-card-social-btns {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.reset-card-social-btns a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    width: 50px;
+    height: 50px;
+    background-color: rgba(255, 255, 255, .6);
+    border-radius: 100px;
+    transition: all .5s;
+}
+
+.reset-card-social-btns a:hover {
+    background-color: white;
+    transform: scale(1.1);
+}
+/* ---------- */
+
+
+/* Responsive */
+@media (max-width: 768px) {
+
+    body {
+        padding: 2rem 0;
+    }
+
+    .reset-card {
+        width: 280px;
+        padding: 2rem;
+    }
+
+}
+/* ---------- */

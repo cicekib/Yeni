@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,600,0,0" />
+    <title>Shopping Cart</title>
+  </head>
+
+  <body>
+    <div class="Shopping-chart-container">
+        <div class="title-container">
+          <h1>Shopping Cart</h1>
+        </div>
+        <div class="Button-container">
+                <button id="checkout-button">Proceed to Checkout</button>
+                <script type="text/javascript">
+                var button = document.getElementById('checkout-button');
+                button.addEventListener('click', function () {
+                var request = new XMLHttpRequest();
+
+                // create-payment.php is implemented in Step 2
+                request.open('GET', 'create-payment.php', true); 
+                request.onload = function () {
+                  const data = JSON.parse(this.response);        // If parse error, check output 
+                  if (!data.paymentId) {                         // from create-payment.php
+                    console.error('Error: Check output from create-payment.php');
+                    return;
+                  }
+                  console.log(this.response);
+
+                  // checkout.html is implemented in Step 3
+                  window.location = 'checkout.html?paymentId=' + data.paymentId;
+                }
+                request.onerror = function () { console.error('connection error'); }
+                request.send();
+                });
+
+                </script>
+        </div>
+    </div>
+  </body>
+</html>
