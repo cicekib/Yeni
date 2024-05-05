@@ -8,13 +8,13 @@ function extractEventData(html) {
 
     // Example: extracting event type, name, time, and details link
     doc.querySelectorAll('.event').forEach(eventElement => {
-        const eventType = eventElement.querySelector('.event-type').innerText;
+        const eventPrice = eventElement.querySelector('.event-price').innerText;
         const eventName = eventElement.querySelector('.event-name').innerText;
         const eventTime = eventElement.querySelector('.event-time').innerText;
         const detailsLink = eventElement.querySelector('.event-details').href;
 
         events.push({
-            type: eventType,
+            price: eventPrice,
             name: eventName,
             time: eventTime,
             detailsLink: detailsLink
@@ -34,15 +34,15 @@ function displayEvents(events) {
         //const newRow = table.insertRow();
 
         // Create cells for each event property
-        const eventTypeCell = newRow.insertCell();
+        const eventPriceCell = newRow.insertCell();
         const eventNameCell = newRow.insertCell();
         const eventTimeCell = newRow.insertCell();
         const detailsLinkCell = newRow.insertCell();
         console.log("eventNameCell: ", eventNameCell)
-        console.log("eventNameCell: ", event.type, event.name)
+        console.log("eventPriceCell: ", event.price)
 
         // Set the innerHTML of each cell with the corresponding event property
-        eventTypeCell.innerHTML = event.type;
+        eventPriceCell.innerHTML = event.price;
         eventNameCell.innerHTML = event.name;
         eventTimeCell.innerHTML = event.date;
         detailsLinkCell.innerHTML = `<a href="${event.link}">Details</a>`;
@@ -87,31 +87,6 @@ async function handleSearch() {
 document.getElementById('searchButton').addEventListener('click', handleSearch);
 
 
-//Function to add event manually by submit form
-document.getElementById('eventForm').addEventListener('submit', function (event) {
-    event.preventDefault();
-    var eventType = document.getElementById('eventType').value;
-    var eventName = document.getElementById('eventName').value;
-    var eventTime = document.getElementById('eventTime').value;
-    var eventLink = document.getElementById('eventLink').value;
-
-    var table = document.getElementById('eventTable');
-    var newRow = table.insertRow(-1);
-    var cell1 = newRow.insertCell(0);
-    var cell2 = newRow.insertCell(1);
-    var cell3 = newRow.insertCell(2);
-    var cell4 = newRow.insertCell(3);
-
-    cell1.innerHTML = eventType;
-    cell2.innerHTML = eventName;
-    cell3.innerHTML = eventTime;
-    cell4.innerHTML = '<a href="' + eventLink + '">Link</a>';
-
-    document.getElementById('eventType').value = '';
-    document.getElementById('eventName').value = '';
-    document.getElementById('eventTime').value = '';
-    document.getElementById('eventLink').value = '';
-});
 
 function filterTable() {
     var input, typeFilter, nameFilter, table, tr, typeTd, nameTd, i, typeTxtValue, nameTxtValue;

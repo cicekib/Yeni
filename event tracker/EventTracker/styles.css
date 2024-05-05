@@ -206,19 +206,6 @@ th {
   padding: 20px 20px;
 }
 
-#submitform {
-  margin-top: 100px;
-}
-
-#eventform {
-  align-content: center;
-  width: 30%;
-  height: 50px;
-  padding: 10px 10px;
-  margin: 8px 0;
-  box-sizing: border-box;
-  margin-top: 50px;
-}
 
 #about,
 #contact,
